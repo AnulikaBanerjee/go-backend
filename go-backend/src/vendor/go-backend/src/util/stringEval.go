@@ -5,53 +5,72 @@ import (
 	"strconv"
 )
 
-func GetEvaluatedString(g string) string {
+func getSanitizedString(userInput string) string {
+	reg := regexp.MustCompile(`[^0-9\+\-\*\/]+`)
+	sanitizedString := reg.ReplaceAllString(userInput, "")
+	return sanitizedString
+}
+
+func getUserNumbersFromInput(operandString1 string, operandString2 string) (int, int) {
+	userInputFirstNumber, _ := strconv.Atoi(operandString1)
+	userInputSecondNumber, _ := strconv.Atoi(operandString2)
+	return userInputFirstNumber, userInputSecondNumber
+}
+
+func getProcessedString(userInput string, finalRes int) string {
+	tempStr := strconv.Itoa(finalRes)
+	finalString := userInput + "= " + tempStr
+	return finalString
+}
+
+func GetEvaluatedString(userInput string) string {
 	var finalRes int
 	var finalString string
-	reg := regexp.MustCompile(`[^0-9\+\-\*\/]+`)
-	processedString := reg.ReplaceAllString(g, "")
-	// Now define an operation
-	a := regexp.MustCompile(`\+`)
-	arr := a.Split(processedString, 2)
+
+	sanitizedString := getSanitizedString(userInput)
+	// Now perform an operation based on user input
+
+	//if Operator is addition
+	operator := regexp.MustCompile(`\+`)
+	arr := operator.Split(sanitizedString, 2)
 	if len(arr) > 1 {
-		finalRes1, _ := strconv.Atoi(arr[0])
-		finalRes2, _ := strconv.Atoi(arr[1])
-		finalRes = finalRes1 + finalRes2
-		tempStr := strconv.Itoa(finalRes)
-		finalString = g + "= " + tempStr
+		userInputFirstNumber, userInputSecondNumber := getUserNumbersFromInput(arr[0], arr[1])
+		finalRes = userInputFirstNumber + userInputSecondNumber
+		finalString = getProcessedString(userInput, finalRes)
 		return finalString
 	}
-	a = regexp.MustCompile(`-`)
-	arr = a.Split(processedString, 2)
+	//if Operator is subtraction
+	operator = regexp.MustCompile(`-`)
+	arr = operator.Split(sanitizedString, 2)
 	if len(arr) > 1 {
-		finalRes1, _ := strconv.Atoi(arr[0])
-		finalRes2, _ := strconv.Atoi(arr[1])
-		finalRes = finalRes1 - finalRes2
-		tempStr := strconv.Itoa(finalRes)
-		finalString = g + "= " + tempStr
+		userInputFirstNumber, userInputSecondNumber := getUserNumbersFromInput(arr[0], arr[1])
+		finalRes = userInputFirstNumber - userInputSecondNumber
+		finalString = getProcessedString(userInput, finalRes)
 		return finalString
 	}
-	a = regexp.MustCompile(`\*`)
-	arr = a.Split(processedString, 2)
+	//if Operator is multiplication
+	operator = regexp.MustCompile(`\*`)
+	arr = operator.Split(sanitizedString, 2)
 	if len(arr) > 1 {
-		finalRes1, _ := strconv.Atoi(arr[0])
-		finalRes2, _ := strconv.Atoi(arr[1])
-		finalRes = finalRes1 * finalRes2
-		tempStr := strconv.Itoa(finalRes)
-		finalString = g + "= " + tempStr
+		userInputFirstNumber, userInputSecondNumber := getUserNumbersFromInput(arr[0], arr[1])
+		finalRes = userInputFirstNumber * userInputSecondNumber
+		finalString = getProcessedString(userInput, finalRes)
 		return finalString
 	}
-	a = regexp.MustCompile(`\/`)
-	arr = a.Split(processedString, 2)
+	//if Operator is division
+	operator = regexp.MustCompile(`\/`)
+	arr = operator.Split(sanitizedString, 2)
 	if len(arr) > 1 {
-		finalRes1, _ := strconv.Atoi(arr[0])
-		finalRes2, _ := strconv.Atoi(arr[1])
-		finalRes = finalRes1 / finalRes2
-		tempStr := strconv.Itoa(finalRes)
-		finalString = g + "= " + tempStr
+		userInputFirstNumber, userInputSecondNumber := getUserNumbersFromInput(arr[0], arr[1])
+		if userInputSecondNumber == 0 {
+			return "Oops!!! Detected Divide by 0"
+		}
+		finalRes = userInputFirstNumber / userInputSecondNumber
+		finalString = getProcessedString(userInput, finalRes)
 		return finalString
 	}
 
-	return "Oops no operator found in" + g
+	//else return error message
+	return "Oops!!! Is something wrong with the input provided? " + userInput
 
 }
