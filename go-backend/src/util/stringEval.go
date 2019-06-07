@@ -62,6 +62,9 @@ func GetEvaluatedString(userInput string) string {
 	arr = operator.Split(sanitizedString, 2)
 	if len(arr) > 1 {
 		userInputFirstNumber, userInputSecondNumber := getUserNumbersFromInput(arr[0], arr[1])
+		if userInputSecondNumber == 0 {
+			return "Oops!!! Detected Divide by 0"
+		}
 		finalRes = userInputFirstNumber / userInputSecondNumber
 		finalString = getProcessedString(userInput, finalRes)
 		return finalString

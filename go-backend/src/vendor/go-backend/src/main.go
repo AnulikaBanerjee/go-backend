@@ -42,17 +42,16 @@ func (manager *ClientManager) start() {
 		select {
 		case conn := <-manager.register:
 			manager.clients[conn] = true
-			jsonMessage, _ := json.Marshal(&Message{Content: "/A new socket has connected."})
-			manager.send(jsonMessage, conn)
+			// jsonMessage, _ := json.Marshal(&Message{Content: "/A new user has connected."})
+			// manager.send(jsonMessage, conn)
 		case conn := <-manager.unregister:
 			if _, ok := manager.clients[conn]; ok {
 				close(conn.send)
 				delete(manager.clients, conn)
-				jsonMessage, _ := json.Marshal(&Message{Content: "/A socket has disconnected."})
-				manager.send(jsonMessage, conn)
+				// jsonMessage, _ := json.Marshal(&Message{Content: "/A user has disconnected."})
+				// manager.send(jsonMessage, conn)
 			}
 		case message := <-manager.broadcast:
-			//message = []byte{'g', 'o', 'l', 'a', 'n', 'g'}
 			for conn := range manager.clients {
 				select {
 				case conn.send <- message:
@@ -88,7 +87,6 @@ func (c *Client) read() {
 		}
 		res := util.GetEvaluatedString(string(message))
 		jsonMessage, _ := json.Marshal(&Message{Sender: c.id, Content: res})
-		//jsonMessage=jsonMessage[0:3]
 		manager.broadcast <- jsonMessage
 	}
 }
@@ -132,5 +130,5 @@ func main() {
 	fmt.Println("Starting application...")
 	go manager.start()
 	http.HandleFunc("/ws", wsPage)
-	http.ListenAndServe("", nil)
+	http.ListenAndServe(":12345", nil)
 }
